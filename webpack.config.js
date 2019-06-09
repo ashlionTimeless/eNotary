@@ -11,6 +11,7 @@ const config = {
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     compress: true,
+    public:'legaldev.pro',
     port: 3003
   },
   watchOptions: {

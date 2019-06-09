@@ -1,0 +1,35 @@
+body {
+    background-color:#F0F0F0;
+    padding: 2em;
+    font-family: 'Raleway','Source Sans Pro', 'Arial';
+}
+/*.container {
+    width: 50%;
+    margin: 0 auto;
+}*/
+label {
+    display:block;
+    margin-bottom:10px;
+}
+input {
+    padding:10px;
+    margin-bottom: 1em;
+}
+button {
+    margin: 2em 0;
+    padding: 1em 4em;
+    display:block;
+}
+.container{
+    width: 100%;
+}
+
+.input-small{
+    width:100px;
+}
+.input-medium{
+    width:200px;
+}
+.input-large{
+    width:400px;
+}

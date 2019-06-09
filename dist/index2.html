@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Blockchain Apostille Demo</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="bundle.js"></script>
+</head>
+<body>
+    <style>
+        .radio-td{
+            width:30px;
+        }
+    </style>
+<div class="container" style="width: 100%">
+    <br>
+    <div id="upload-apostille" class="block col-xs-4">
+        <h2>Upload Apostille:</h2>
+        <h3>In order to upload document as apostille to blockchain, you need:</h3>
+        <div>
+            <p>Step 1: insert your private key. This private key is used to sign the Apostile Sending operation</p>
+            <input id="privKey" placeholder="Paste your key here">
+             <div class="card-body">
+            <p class="card-title pricing-card-title">To work with blockchain you likely need private key with ether for transactions. If you dont have private key - click here and I will give you random private key with some testnet Ethereum.</p>
+            <button onclick="giveMePrivKey()" type="button" class="btn btn-lg btn-block btn-primary">Give me private key</button>
+        </div>
+<script>
+
+        let privateKeys = [
+        "479b1797b38b42e34cceee7a468ccbaa88ea8b87a68fd4690f14662b9861450e",
+        "811e620489b648b2567cd46f56c8e1e2d252da42c8a7d18b6a5c9e20f512e479",
+        "4f9677088a48cfd52c9300db7df982e1d3d7ac09945e244df4a417fc28f58408",
+        "7c228a3728502833ee44bb118b7cc1fbc37f1d3be6769bb5f24e1ca4251b9be0",
+        "3de49d0159ebba5d5b28d96bc6724958ad3f20bc70ba90062873c1926f92b81b"
+        ]
+        function giveMePrivKey(){
+                let privKey = privateKeys[getRandomInt(privateKeys.length)];
+        alert("Copy this private key: "+privKey);
+        }
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+</script>
+        </div>
+        <div>
+            <p>Step 2: Select document:</p>
+            <input type="file" id="fileinput">            
+        	<p>After you select the document, it will be converted to Base64 encoding, than it will be fed into sha256 hash function and be transformed into hash</p>
+       		<button onclick="alert(base64)"> How my document looks in base64?</button>
+       		<button onclick="alert(sha256)"> How my document looks in hash?</button>
+        </div>
+        <div>
+            <p>Step 3: Type in some tag for your new apostille. The Apostille will be saved in unreadable format, so this tag will help find particular apostille</p>
+            <input type="text" id="inputTag" placeholder="Tag for Apostille">            
+        </div>
+        <div>
+            <p>Step 4: Push the button</p>
+            <button id="addApostille">Upload Apostille</button>
+            <p id="addApostilleMessage"></p>            
+        </div>
+    </div>
+    <div id="get-all-apostilles" class="block col-xs-4">
+        <h2>Get all apostilles of particular user</h2>
+        <p>Your Ethereum Address is:</p>            
+        <p id="userAddress"></p>            
+        <button id="getApostilles">Get Apostilles</button>
+        <input id="getApostillesOwner" placeholder="Owner">
+        <table id="apostillesTable">
+        </table>        
+    </div>
+    <div id="verify-apostille" class="block col-xs-4">
+        <h2>Apostille Verification</h2>
+        <h3>To verify if certain user has uploaded particular document to network, you need to have this user's address and hash of the document in question. If the document was apostilized by this user, the Verify button will return positive result</h3>
+        <input type="file" id="verifyFile">
+        <input id="verifyOwner" placeholder="Verify Owner">
+        <button id="verify">Verify</button>
+        <div id="results"></div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+        let application = window.application;
+        let userAddress = '';
+        let base64 = '';
+        let sha256 = '';
+
+        let vbase64 = '';
+        let vsha256 = '';
+    
+    var fileinput = document.getElementById("fileinput");
+    var vfileinput = document.getElementById("verifyFile");
+
+    $("#fileinput").on('input',async (data)=>{
+        var file = fileinput.files[0];
+        base64 = await getBase64(file); // prints the base64 string
+        console.log(base64);
+        sha256 = await getSha256(base64);
+        console.log(sha256);
+    });
+    
+    $("#verifyFile").on('input',async (data)=>{
+        var file = vfileinput.files[0];
+        vbase64 = await getBase64(file); // prints the base64 string
+        console.log(vbase64);
+        vsha256 = await getSha256(vbase64);
+        console.log(vsha256);
+    });
+
+    $("#privKey").on('change',async(e)=>{
+        let privKey = e.target.value;
+        console.log(privKey)
+        let address = '';
+        address= application.eth.getAddressFromPrivKey(privKey);
+        document.getElementById("userAddress").innerHTML=address;
+        userAddress = address;
+    });
+
+    $("#addApostille").on("click",async()=>{
+        let privKey = document.getElementById("privKey").value;
+        let _tag = document.getElementById('inputTag').value;
+        if(!_tag){
+            _tag = 'MyApostille';
+        }
+        if(sha256){
+            if(privKey){
+                try{
+                    let result = await application.addApostille(sha256,_tag,privKey);
+                    if(result){
+                        document.getElementById("addApostilleMessage").innerHTML = "You have uploaded your apostille by creating transaction <br>"+result+"<br> You can look up its progress <a href='https://ropsten.etherscan.io/tx/"+result+"'> HERE </a> By the way, transaction structure was dumped into your browser console. You may open it by pressing F12, Ctrl+Shift+I or other combinations depending on your browser"
+                    }
+                }catch(e){
+                    alert(e)
+                }
+            }else{
+                alert('No private key entered')
+            }
+        }else{
+            alert("No file uploaded");
+        }
+    });
+
+    $("#getApostilles").on("click",async()=>{
+        let address = document.getElementById("getApostillesOwner").value;
+        if(address!=''){
+            let allApostilles = await getAllApostilles(address);
+            console.log(allApostilles);
+            fillTable(allApostilles);            
+        }else{
+            alert('Insert address whose apostilles to search. If you are looking for your apostilles, your address is shown as "Your Ethereum Address"')
+        }
+    })
+    $("#verify").on("click",async()=>{
+        let address = document.getElementById('verifyOwner').value;
+        if(address){
+            if(vsha256){
+                let result = await verify(vsha256,address);
+                if(result){
+                    alert('Document was indeed uploaded by this user')
+                }else{
+                    alert('This document was not uploaded before or not by this user');
+                }
+            }else{
+                alert('Upload verified file')
+            }
+        }else{
+            alert('Insert verified user address')
+        }        
+        
+    })
+
+    function getBase64(file) {
+        return new Promise(async(resolve,reject)=>{
+            try{
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function () {
+                    return resolve(reader.result);
+                };
+                reader.onerror = function (error) {
+                    throw error;
+                };
+            }catch(e){
+                return reject(e);
+            }
+        })
+    }
+    function getSha256(string){
+        return new Promise(async(resolve,reject)=>{
+            try{
+                let hash = await application.eth.defaultProvider.utils.soliditySha3(string);
+                //web3.utils.soliditySha3(
+                return resolve(hash);
+            }catch(e){
+                return reject(e);
+            }
+        })
+    }
+
+    function fillTable(apostilleData){
+        var table = document.getElementById("apostillesTable");
+        $('#apostillesTable').find('input').remove().end();
+
+        for(let key in apostilleData){
+            let tr = document.createElement('tr')
+
+            let td = document.createElement('td');
+            console.log(apostilleData[key])
+            let subtable = createSubTable(apostilleData[key].tag,apostilleData[key].hash,apostilleData[key].timestamp)
+            td.appendChild(subtable);
+            tr.appendChild(td);
+            table.appendChild(tr)
+        }    
+    }
+    function createSubTable(tag,hash,datetime){
+            let subtable = document.createElement('table');
+            subtable.appendChild(createSubRow("Tag",tag));            
+            subtable.appendChild(createSubRow("Hash",hash));
+            subtable.appendChild(createSubRow("Datetime",datetime));
+            return subtable;
+    }
+    function createSubRow(label,value){
+            let subrow = document.createElement('tr')
+            let labeltd = document.createElement('td');
+            labeltd.setAttribute('class','td-label')
+            p = document.createElement('p');
+            p.innerHTML=label;
+            labeltd.appendChild(p);
+            subrow.appendChild(labeltd);
+
+            valuetd = document.createElement('td');
+            p = document.createElement("p");
+            p.innerHTML = value;
+            valuetd.appendChild(p);
+            subrow.appendChild(valuetd);
+            return subrow;
+    }
+        function fillResults(candidatesData){
+        var table = document.getElementById("results");
+        $('#results').find('li').remove().end();
+
+        for(let key in candidatesData){
+            var p = document.createElement("p");
+            p.innerHTML = candidatesData[key].name + " - " +candidatesData[key].votes;
+            table.appendChild(p)
+        }    
+    }
+    function getAllApostilles(address){
+        return new Promise(async(resolve,reject)=>{
+            try{
+                let allApostillesData = await application.getAllApostilles(address);
+                return resolve(allApostillesData);
+            }catch(e){
+                return reject(e);
+            }         
+        })        
+    }
+    function verify(_hash,_owner){
+        return new Promise(async(resolve,reject)=>{
+            try{
+                let result = await application.verify(_hash,_owner);
+                return resolve(result);
+            }catch(e){
+                return reject(e);
+            }         
+        })         
+    }
+</script>
+</body>
+</html>

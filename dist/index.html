@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ENotary</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>
+    <script src="bundle.js"></script>
+</head>
+<body>
+    <style>
+        .radio-td{
+            width:30px;
+        }
+        body{
+            font-family: "Times New Roman";
+            font-size:26px;
+        }
+        #document-template{
+            padding: 5%;
+            border:1px solid gray;
+        }
+        button{
+            background-color: #333;
+            text-align: center;
+            font-size: 16px;
+            height: 50px;
+            color: #fff;
+            border: none;
+            padding: 10px 43px;
+            margin:1%;
+        }
+        input{
+            border:0;
+            border-bottom:1px solid black;
+            min-height:30px;
+        }
+        h1{
+            font-weight: bold;
+        }
+    </style>
+<div class="container" style="width: 100%">
+    <div>
+        <center><h1 class="col-sm-12">ENotary</h1></center>
+        <center><h3 class="col-sm-12" style="font-style: italic">...Наш девіз...</h3></center>
+    </div>
+
+    <div id="auth-form" class="block col-sm-12">
+        <center><h3>Вхід в систему</h3></center>
+
+        <div class="col-sm-12">
+            <center>
+                <input id="input-privKey" type="file" name="privKey">
+                <button id="authenticate">Далі</button>
+            </center>
+        </div>
+    </div>
+    <br>
+    <div id="cabinet" style="display: none">
+        <center><h2>Кабінет</h2></center>
+
+        <div id="your-public-key">Ваш публічний ключ:<i id="pubkey"></i></div>
+        <div id="navigation" class="block col-sm-12">
+            <button data-target="document-creator" class="navigation-button col-sm-3">Створити довіреність</button>
+            <!--<button data-target="my-documents" class="navigation-button col-sm-3">Переглянути довіреності</button>-->
+            <button data-target="verify-document" class="navigation-button col-sm-3">Перевірити довіреність</button>
+        </div>
+        <div id="document-creator" class="block col-sm-12">
+            <h3>Конструктор довіреностей</h3>
+            <div id="document-type-navigation" class="col-sm-12">
+                <h3 class="col-sm-12">Шаблони</h3>
+                <button class="document-options col-sm-3" data-value="1">Документ 1</button>
+                <button class="document-options col-sm-3" data-value="2">Документ 2</button>
+                <button class="document-options col-sm-3" data-value="3">Документ 3</button>
+            </div>
+            <div id="document-template" class="container col-sm-12" style="display: none"></div>
+            <div id="document-complete" class="container col-sm-12"></div>
+            <center><button id="submit-document">Підтвердити</button></center>
+            <a id="download" download="document" style="display:none">Download</a>
+        </div>
+        <br>
+        <div id="verify-document" class="block col-sm-12" style="display:none">
+            <h3>Завантажте довіреність: </h3>
+            <input type="file" id="document-for-verification">
+            <button id="verify">Перевірити довіреність</button>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript">
+        let application = window.application;
+        let documentReady = false;
+
+    if(getPrivateKey()){
+        authenticate();
+    }
+    // Authentication
+    $("#input-privKey").on('input',async (data)=>{
+        let fileinput = document.getElementById("input-privKey");
+        let file = fileinput.files[0];
+        let base64 = await this.application.getBase64FromFile(file); // prints the base64 string
+//        sha256 = await getSha256(base64);
+        let result = this.application.keccakLib('keccak256').update(base64).digest('hex');
+        setPrivateKey(result);
+        if(getAddress()){
+            authenticate();
+            // alert('Ваш цифровий підпис успішно завантажено');
+        }
+    });
+
+    $("#authenticate").on('click',()=>{
+
+    });
+
+    function authenticate(){
+        let address = this.application.getAddress();
+        document.getElementById('pubkey').innerHTML=address;
+        hideBlock('auth-form');
+        showBlock('cabinet');
+    }
+    $(".navigation-button").on('click',(event)=>{
+        let elem = event.currentTarget;
+        console.log(elem)
+        let target = elem.getAttribute('data-target');
+        hideAllPages()
+        showBlock(target);
+    });
+
+    function hideAllPages(){
+        hideBlock('document-creator');
+        hideBlock('verify-document')
+    }
+        // Document construction
+        $(".document-options").on('click',(event)=>{
+            let element = event.currentTarget;
+            let documentKey = element.getAttribute("data-value");
+            setDocumentTemplate(documentKey);
+        });
+
+        function setDocumentTemplate(documentKey){
+            showBlock('document-template');
+            showBlock('submit-document')
+            let template = application.getDocumentTemplate(documentKey);
+            document.getElementById('document-template').innerHTML = template.content;
+            // $(".document-input").on('change',()=>{
+            //     let composedDocument = composeDocument();
+            //     if(composedDocument){
+            //         downloadDocument(composedDocument);
+            //     }
+            // })
+        }
+
+
+        $("#submit-document").on('click',()=>{
+            submitDocument();
+        });
+
+        function submitDocument(){
+            return new Promise(async(resolve,reject)=>{
+                try{
+                    let htmlDoc = composeDocument();
+                    let sha256 = await downloadDocument(htmlDoc);
+                    let result = await addApostille(sha256);
+                    if(result){
+                        alert("You have uploaded your apostille by creating transaction <br>"+result+"<br> You can look up its progress <a href='https://ropsten.etherscan.io/tx/"+result+"'> HERE </a>");
+                    }
+                }catch (e) {
+                    alert(e);
+                }
+            })
+        }
+        function composeDocument(){
+            const element = document.getElementById('document-template');
+            const collection = element.getElementsByClassName('document-input');
+            let clone = element.cloneNode(true);
+            document.getElementById("document-complete").appendChild(clone);
+            clone.setAttribute('id','document-template-finished');
+            clone.setAttribute('style','display:none');
+            const clonedCollection = clone.getElementsByClassName('document-input');
+            let fieldsFull = true;
+            for (let i = 0; i < collection.length; i++) {
+                const newP = document.createElement('span');
+                console.log(collection[i].value)
+                if(!collection[i].value){
+                    collection[i].style='background-color:red';
+                    fieldsFull=false;
+                }
+                newP.innerHTML = collection[i].value;
+                newP.classList.add('is-value');
+                clonedCollection[i].parentNode.insertBefore(newP, clonedCollection[i]);
+                clonedCollection[i].classList.add('hidden')
+            }
+            if(fieldsFull){
+                console.log('FIELDS ARE FULL')
+                $('.hidden').remove();
+                return clone.innerHTML;
+            }
+            return false;
+
+        }
+
+        async function downloadDocument(htmlDoc){
+            let url = application.fileService.composeFileUri(htmlDoc);
+            //let base64 = await application.getBase64(url); // prints the base64 string
+            let sha256 = await application.getSha256(htmlDoc);
+            let a = document.getElementById('download');
+            a.setAttribute('href',url);
+            a.click();
+
+            // Cleanup
+            // window.URL.revokeObjectURL(a.href);
+            // document.body.removeChild(a);
+            // window.open(url,'_blank');
+            return sha256;
+        }
+
+
+
+
+
+        $("#getApostilles").on("click",async()=>{
+            let address = document.getElementById("getApostillesOwner").value;
+            if(address!=''){
+                let allApostilles = await getAllApostilles(address);
+                console.log(allApostilles);
+                fillTable(allApostilles);
+            }else{
+                alert('Insert address whose apostilles to search. If you are looking for your apostilles, your address is shown as "Your Ethereum Address"')
+            }
+        })
+
+        $("#verify").on("click",async()=>{
+            let fileinput = document.getElementById("document-for-verification");
+            let file = fileinput.files[0];
+            let base64 = await application.getBase64FromFile(file); // prints the base64 string
+            let sha256 = await application.getSha256(base64);
+            let address = getAddress();
+            if(address){
+                if(sha256){
+                    let result = await verify(sha256,address);
+                    if(result){
+                        alert('Document was indeed uploaded by this user')
+                    }else{
+                        alert('This document was not uploaded before or not by this user');
+                    }
+                }else{
+                    alert('Upload verified file')
+                }
+            }else{
+                alert('Insert verified user address')
+            }
+        });
+
+
+
+        function getPrivateKey(){
+            return localStorage.getItem('privKey');
+        }
+        function setPrivateKey(privKey){
+            return localStorage.setItem('privKey',privKey);
+        }
+
+
+        async function addApostille(file){
+            return new Promise(async(resolve,reject)=>{
+                let _tag = 'Document 123';
+                let privKey = getPrivateKey();
+                try{
+                    let result = await this.application.addApostille(file,_tag,privKey);
+                    return resolve(result);
+                }catch(e){
+                    return reject(e)
+                }
+            });
+        }
+
+
+        function verify(_hash,_owner){
+            return new Promise(async(resolve,reject)=>{
+                try{
+                    let result = await application.verify(_hash,_owner);
+                    return resolve(result);
+                }catch(e){
+                    return reject(e);
+                }
+            })
+        }
+
+        function getAddress(){
+            let privKey = getPrivateKey();
+            return application.eth.getAddressFromPrivKey(privKey);
+        }
+
+        function getAllApostilles(address){
+            return new Promise(async(resolve,reject)=>{
+                try{
+                    let allApostillesData = await application.getAllApostilles(address);
+                    return resolve(allApostillesData);
+                }catch(e){
+                    return reject(e);
+                }
+            })
+        }
+
+        function hideBlock(id){
+            $("#"+id).fadeOut();
+        }
+        function showBlock(id){
+            setTimeout(()=>{
+                $("#"+id).fadeIn();
+            },300)
+        }
+
+
+</script>
+</body>
+</html>

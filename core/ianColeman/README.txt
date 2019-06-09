@@ -1,0 +1,1 @@
+This is modified version of a web tool for converting BIP39 mnemonic codes https://github.com/iancoleman/bip39. Original authorship belongs to https://github.com/iancoleman

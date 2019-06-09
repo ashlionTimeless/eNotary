@@ -1,5 +1,5 @@
 module.exports =  {
-    name: "Document 2",
+    name: "Document 1",
     content: "<p><center><strong>ДОВІРЕНІСТЬ</strong></center></p>\n" +
         "\n" +
         "<p>Мiсто Київ, двадцять дев&rsquo;яте травня двi тисячi шостого року</p>\n" +

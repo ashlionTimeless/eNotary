@@ -5,93 +5,368 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>ENotary</title>
-    <link rel="stylesheet" type="text/css" href="main.css">
+    <!--<link rel="stylesheet" type="text/css" href="main.css">-->
+    <link rel="stylesheet" type="text/css" href="css/various.css">
+
+    <link rel="stylesheet" type="text/css" href="css/all.css">
+    <link rel="stylesheet" type="text/css" href="css/introjs.css">
+    <link rel="stylesheet" type="text/css" href="css/ionicons.min.css">
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>
     <script src="bundle.js"></script>
-</head>
-<body>
     <style>
-        .radio-td{
-            width:30px;
-        }
         body{
-            font-family: "Times New Roman";
-            font-size:26px;
+            margin: 0;
+            font-family: ProbaProRegular, Arial, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #868ba1;
+            text-align: left;
+            background-color: #f2f7fd;
         }
         #document-template{
-            padding: 5%;
-            border:1px solid gray;
+            font-size: 20px;
+            padding: 4%;
+            border: 1px solid gray;
+            margin: 1%;
+            color: black;
         }
-        button{
-            background-color: #333;
-            text-align: center;
-            font-size: 16px;
-            height: 50px;
-            color: #fff;
-            border: none;
-            padding: 10px 43px;
-            margin:1%;
+        .input-small{
+            width:100px;
+        }
+        .input-medium{
+            width:200px;
+        }
+        .input-large{
+            width:400px;
         }
         input{
             border:0;
             border-bottom:1px solid black;
             min-height:30px;
         }
-        h1{
-            font-weight: bold;
-        }
     </style>
-<div class="container" style="width: 100%">
-    <div>
-        <center><h1 class="col-sm-12">ENotary</h1></center>
-        <center><h3 class="col-sm-12" style="font-style: italic">...Наш девіз...</h3></center>
-    </div>
+</head>
 
-    <div id="auth-form" class="block col-sm-12">
-        <center><h3>Вхід в систему</h3></center>
-
-        <div class="col-sm-12">
-            <center>
-                <input id="input-privKey" type="file" name="privKey">
-                <button id="authenticate">Далі</button>
-            </center>
+<body id="body" class="change_font_size">
+<div class="edriver-header">
+    <div class="container container_wrap">
+        <div class="edriver-header-left">
+            <a class="main-logo main-logo-light" href="#">
+                <div class="icon-flag">
+                    <div class="yellow"></div>
+                    <div class="blue"></div>
+                </div>
+                <div class="wrap-text">
+                    <span class="one">gov.ua</span>
+                    <span class="light">Державні сайти України</span>
+                </div>
+            </a>
         </div>
-    </div>
-    <br>
-    <div id="cabinet" style="display: none">
-        <center><h2>Кабінет</h2></center>
+        <div class="edriver-header-left dis-flex">
 
-        <div id="your-public-key">Ваш публічний ключ:<i id="pubkey"></i></div>
-        <div id="navigation" class="block col-sm-12">
-            <button data-target="document-creator" class="navigation-button col-sm-3">Створити довіреність</button>
-            <!--<button data-target="my-documents" class="navigation-button col-sm-3">Переглянути довіреності</button>-->
-            <button data-target="verify-document" class="navigation-button col-sm-3">Перевірити довіреність</button>
-        </div>
-        <div id="document-creator" class="block col-sm-12">
-            <h3>Конструктор довіреностей</h3>
-            <div id="document-type-navigation" class="col-sm-12">
-                <h3 class="col-sm-12">Шаблони</h3>
-                <button class="document-options col-sm-3" data-value="1">Документ 1</button>
-                <button class="document-options col-sm-3" data-value="2">Документ 2</button>
-                <button class="document-options col-sm-3" data-value="3">Документ 3</button>
+
+            <div class="trezub">
+                <a href="/" title="Головна сторінка"> <img src="/static/img/trezub.png" alt="Головна сторінка"></a>
             </div>
-            <div id="document-template" class="container col-sm-12" style="display: none"></div>
-            <div id="document-complete" class="container col-sm-12"></div>
-            <center><button id="submit-document">Підтвердити</button></center>
-            <a id="download" download="document" style="display:none">Download</a>
+
+            <div class="wrap-text">
+                <a href="/" title="Головна сторінка">   <span class="big-fat">Електронний нотаріат</span></a>
+            </div>
+
+        </div>
+        <!-- edriver-header-left -->
+        <div class="edriver-header-right">
+            <div class="change" id="change">
+                <img class="icon_change icon_change_header" id="change_lowvision" src="/static/img/icn-accessability.png" alt="">
+                <div class="fontchangers " id="fonts">
+            <span>
+                <a class="increase">А+</a>
+                <a class="decrease">А-</a>
+              <a id="reset" class="reset" style="display: block;">скинути</a>
+            </span>
+                </div>
+            </div>
+
+
+            <!-- For IntroJS -->
+            <!--<div class="wrap_info">-->
+                <!--<a href="#" class="header-notification intro-begin" id="info">-->
+                    <!--<i class="fa fa-question"></i>-->
+                <!--</a>-->
+            <!--</div>-->
+            <!--<div class="icon" id="searching" data-toggle="modal" data-target="#search_modal" data-effect="effect-just-me"><i class="fa fa-search" aria-hidden="true"></i></div>-->
+
+            <div class="dropdown dropdown-c">
+                <a href="#" class="logged-user" data-toggle="dropdown">
+
+                    <span id="your-public-key">Ваш публічний ключ:<i id="pubkey"></i></span>
+
+                    <!--<i class="fa fa-angle-down"></i>-->
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <nav class="nav">
+                        <a href="/profile" class="nav-link"><i class="icon ion-forward"></i> Мій профіль</a>
+                        <a href="/auth/logout" class="nav-link"><i class="icon ion-forward"></i> Вийти з акаунту</a>
+                    </nav>
+                </div><!-- dropdown-menu -->
+            </div><!-- dropdown -->
+            <div class="social_box">
+                <ul>
+                    <li>
+                        <a href="#" target="_blank">
+                            <i class="fa fa-facebook-square"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" target="_blank">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" target="_blank">
+                            <i class="fa fa-youtube-play"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div><!-- header-right -->
+
+        <div class="modal-gov" id="modal-gov">
+            <div class="close"></div>
+            <div class="wrap">
+                <ul class="wrap-link">
+                    <li>
+                        <a href="https://www.president.gov.ua/" target="_blank">Президент України</a>
+                    </li>
+                    <li>
+                        <a href="https://www.kmu.gov.ua/" target="_blank">Кабінет Міністрів України</a>
+                    </li>
+                    <li>
+                        <a href="http://rada.gov.ua/" target="_blank">Верховна Рада України</a>
+                    </li>
+                </ul>
+                <ul class="wrap-link">
+                    <li>
+                        <a href="http://www.hsc.gov.ua/" target="_blank">Головний Сервісний Центр</a>
+                    </li>
+                    <li>
+                        <a href="http://www.ccu.gov.ua/" target="_blank">Конституційний суд України</a>
+                    </li>
+                    <li>
+                        <a href="http://www.rnbo.gov.ua/" target="_blank">Рада національної безпеки і оборони України</a>
+                    </li>
+
+                </ul>
+                <ul class="wrap-link" target="_blank">
+                    <li>
+                        <a href="https://www.kmu.gov.ua/ua/catalog">Центральні та місцеві органи виконавчої влади</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="modal-background"></div>
+
+    </div><!-- container -->
+
+
+</div><!-- edriver-header -->
+
+<div class="edriver-navbar">
+    <div class="container">
+        <ul class="nav">
+            <li class="nav-item active" data-intro="Ваша картка водія, в якій відображені Ваші автівки, посвідчення водія, останні штрафи та останні записи в е-чергу">
+                <a  data-target="document-creator" class="navigation-button nav-link" href="#">
+                    <!--<img src="static/img/add.svg"  style="height:20px;width:20px">-->
+                    <span> Створити довіреність</span>
+                </a>
+            </li>
+
+            <li class="nav-item" data-intro="Автопарк містить перелік всіх Ваших автівок">
+                <a data-target="verify-document" class="navigation-button nav-link" href="#">
+                    <!--<img src="static/img/verify.svg" style="height:20px;width:20px">-->
+                    <span> Перевірити довіреність</span>
+                </a>
+            </li>
+        </ul>
+
+    </div><!-- container -->
+</div><!-- edriver-navbar -->
+
+<div class="edriver-mainpanel">
+    <div class="container">
+        <div id="header" class="edriver-pageheader">
+            <ol class="breadcrumb edriver-breadcrumb">
+            </ol>
+            <h6 id="pagetitle" class="edriver-pagetitle">Вхід в кабінет</h6>
+        </div>
+        <div id="auth-form" class="row row-sm mg-t-10">
+            <div class="card card-wrapper col-sm-12">
+                <div class="col-sm-12">
+                    <center>
+                        <input id="input-privKey" type="file" name="privKey">
+                        <button id="authenticate" class="mt-4 btn  submit_btn">Далі</button>
+                    </center>
+                </div>
+            </div>
         </div>
         <br>
-        <div id="verify-document" class="block col-sm-12" style="display:none">
-            <h3>Завантажте довіреність: </h3>
-            <input type="file" id="document-for-verification">
-            <button id="verify">Перевірити довіреність</button>
-        </div>
-    </div>
-</body>
+        <div id="cabinet" style="display: none"  class="row row-sm mg-t-10">
+            <div class="col-lg-12">
+                <div class="card card-wrapper">
+                    <div id="messages">
 
+                    </div>
+
+                    <div id="document-creator" class="block col-sm-12">
+                        <div id="document-type-navigation" class="col-sm-12">
+                            <button class="document-options col-sm-4 mt-4 btn  submit_btn" data-value="1">Дозвіл на виїзд дитини</button>
+                            <button class="document-options col-sm-4 mt-4 btn  submit_btn" data-value="2">Довіреність</button>
+                            <!--<button class="document-options col-sm-3 mt-4 btn  submit_btn" data-value="3">Договір купівлі-продажу</button>-->
+                            <button class="document-options col-sm-4 mt-4 btn  submit_btn" data-value="4">Заява на спадщину</button>
+                        </div>
+                        <div id="document-template" class="container col-sm-12" style="display: none"></div>
+                        <div id="document-complete" class="container col-sm-12"></div>
+                        <center><button id="submit-document" class="mt-4 btn  submit_btn">Підтвердити</button></center>
+                        <a id="download" download="document" style="display:none">Download</a>
+                    </div>
+                    <br>
+                    <div id="verify-document" class="block col-sm-12" style="display:none">
+                        <h3>Завантажте довіреність: </h3>
+                        <input type="file" id="document-for-verification">
+                        <button id="verify" class="mt-4 btn  submit_btn">Перевірити довіреність</button>
+                    </div>
+                </div><!-- row -->
+            </div><!-- container -->
+        </div>
+</div>
+<footer>
+    <div class="container mt-footer">
+        <!--<div class="row">-->
+            <!--<div class="col-md-6">-->
+                <!--<div class="description">-->
+                    <!--<div class="item">-->
+                        <!--<div class="icon"></div>-->
+                        <!--<span class="first links_description">-->
+
+                            <!--Проект реалізовано&nbsp;-->
+                            <!--<a target="_blank" href="http://www.eurasia.org/">Фондом "Євразія"</a>,&nbsp;-->
+                            <!--<a target="_blank" href="http://eef.org.ua/">Фондом Східна Європа</a> та&nbsp;-->
+                            <!--<a target="_blank" href="https://www.e.gov.ua/">Державним агентством з питань електронного урядування України</a>&nbsp; у межах проекту міжнародної технічної допомоги&nbsp;-->
+                            <!--<a target="_blank" href="http://tapas.org.ua/">"Прозорість та підзвітність у державному управлінні та послугах"/TAPAS</a>,&nbsp; за фінансової підтримки&nbsp;-->
+                            <!--<a target="_blank" href="https://www.usaid.gov/">Агентства США з міжнародного розвитку (USAID)</a>&nbsp; та&nbsp;-->
+                            <!--<a target="_blank" href="https://www.gov.uk/government/organisations/department-for-international-development">Уряду Великої Британії (UK aid)</a>-->
+
+                        <!--</span>-->
+                    <!--</div>-->
+                    <!--<div class="item">-->
+                        <!--<div class="icon"></div>-->
+                        <!--<span>-->
+                         <!--Портал працює в режимі дослідної експлуатації.-->
+                         <!--Якщо ви маєте зауваження або пропозиції, будь ласка, напишіть нам:-->
+                        <!--<a href="mailto:support@hsc.gov.ua">support@hsc.gov.ua</a>-->
+                    <!--</span>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="col-md-2">-->
+                <!--<ul class="menu_footer">-->
+                    <!--<li><a href="#" data-target="document-creator" class="navigation-button">Створити довіреність</a></li>-->
+                    <!--<li><a href="#" data-target="verify-document" class="navigation-button">Перевірити довіреність</a></li>-->
+                <!--</ul>-->
+                <!--<div class="links second">-->
+                <!--</div>-->
+                <!--<div class="clearfix"></div>-->
+            <!--</div>-->
+            <!--<div class="col-md-4 right_footer_block">-->
+                <!--<div class="social-links">-->
+                    <!--<ul>-->
+                        <!--<li>-->
+                            <!--<a href="https://www.facebook.com/hsc.gov.ua/?hc_ref=ARTc_MkIJFeO0EtF-fWMxtfHNYkv-1TSC9lvba3XMfl8flDQKPsM2frv-wr4Fl5Lpd0&amp;__xts__%5B0%5D=68.ARCQAlGgjdiSz0Bc7p6R5GgJPmF9udG5kPaqr-QLKCcu3ftL-jSv8jj_Pyfp-PTVKW0BlnL5qsdChW06-BWqfDF3f5XBuyxxZGHWPtRlwR3vT_DAUNxA5zZgaCA2t0VhmUtqBV3TpkgKhVNKpOHLAmUNS3pFZSJMP0BLWLLu1zaH5QtIa3keVg&amp;__tn__=kC-R" target="_blank">-->
+                                <!--<i class="fab fa-2x fa-facebook"></i>-->
+                            <!--</a>-->
+                        <!--</li>-->
+                        <!--<li>-->
+                            <!--<a href="https://t.co/o3gN5nFPGV" target="_blank">-->
+                                <!--<i class="fab fa-2x fa-instagram"></i>-->
+                            <!--</a>-->
+                        <!--</li>-->
+                        <!--<li>-->
+                            <!--<a href="https://www.youtube.com/channel/UCrLEHKVw7kTySvryjZG2_fA" target="_blank">-->
+                                <!--<i class="fab fa-2x fa-youtube"></i>-->
+                            <!--</a>-->
+                        <!--</li>-->
+                    <!--</ul>-->
+                <!--</div>-->
+                <!--<div class="change_footer">-->
+                    <!--<img class="icon_change" id="change_lowvision" src="/static/img/icn-accessability-f.png" alt="">-->
+                    <!--<span>Людям із порушенням зору</span>-->
+                    <!--<a href="/public_offer/" target="_blank" class="extended_link">Публічна оферта</a>-->
+                    <!--<a href="https://www.kmu.gov.ua/ua/services" target="_blank" class="extended_link">Всі електронні послуги</a>-->
+                    <!--<a href="https://e-services.dsbt.gov.ua/" target="_blank" class="extended_link">Кабінет перевізника</a>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="developer">
+                    <div class="license">
+                        <div class="icon"></div>
+                        <span>
+                         Весь контент доступний за ліцензією
+                        <a target="_blank" href="#">Creative Commons Attribution 4.0 International license</a>, якщо не зазначено інше
+                    </span>
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div><!-- container -->
+</footer>
+
+</body>
+<!--<style>-->
+    <!--.radio-td{-->
+        <!--width:30px;-->
+    <!--}-->
+    <!--body{-->
+        <!--font-family: "Times New Roman";-->
+        <!--font-size:26px;-->
+    <!--}-->
+    <!--#document-template{-->
+        <!--padding: 5%;-->
+        <!--border:1px solid gray;-->
+    <!--}-->
+    <!--button{-->
+        <!--background-color: #333;-->
+        <!--text-align: center;-->
+        <!--font-size: 16px;-->
+        <!--height: 50px;-->
+        <!--color: #fff;-->
+        <!--border: none;-->
+        <!--padding: 10px 43px;-->
+        <!--margin:1%;-->
+    <!--}-->
+    <!--input{-->
+        <!--border:0;-->
+        <!--border-bottom:1px solid black;-->
+        <!--min-height:30px;-->
+    <!--}-->
+    <!--h1{-->
+        <!--font-weight: bold;-->
+    <!--}-->
+<!--</style>-->
 <script type="text/javascript">
         let application = window.application;
         let documentReady = false;
@@ -122,6 +397,8 @@
         document.getElementById('pubkey').innerHTML=address;
         hideBlock('auth-form');
         showBlock('cabinet');
+        changeTitle('Конструктор довіреностей');
+
     }
     $(".navigation-button").on('click',(event)=>{
         let elem = event.currentTarget;
@@ -315,8 +592,9 @@
                 $("#"+id).fadeIn();
             },300)
         }
-
-
+        function changeTitle(str){
+            document.getElementById('pagetitle').innerHTML=str;
+        }
 </script>
 </body>
 </html>

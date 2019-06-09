@@ -7,10 +7,15 @@ let keccakLib = require('keccak');
 const PdfHelper = require('../core/services/PdfHelper')
 const FileService = require('../core/services/FileService')
 let template_1 = require('../document_templates/template_1.js');
-let template_2 = require('../document_templates/template_2.js');
+let template_2 = require('../document_templates/template_3.js');
+let template_3 = require('../document_templates/template_2.js');
+let template_4 = require('../document_templates/template_4.js');
+
 let templates = {
     1:template_1,
-    2:template_2
+    2:template_2,
+    3:template_3,
+    4:template_4
 };
 class ClientApplication{
     constructor(){

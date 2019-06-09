@@ -11,7 +11,7 @@ const config = {
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     compress: true,
-    port: 8633
+    port: 3003
   },
   watchOptions: {
       aggregateTimeout: 100

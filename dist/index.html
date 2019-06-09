@@ -49,6 +49,21 @@
             border-bottom:1px solid black;
             min-height:30px;
         }
+        .big-input{
+            height: 40px;
+        }
+        #modal-message{
+            background-color: white;
+            position: fixed;
+            top: 35%;
+            left: 21%;
+            width: 820px;
+            border: 1px solid gray;
+            z-index: 99;
+            height: 26%;
+            padding: 3%;
+            font-size: 16px;
+        }
     </style>
 </head>
 
@@ -210,7 +225,10 @@
             <div class="card card-wrapper col-sm-12">
                 <div class="col-sm-12">
                     <center>
-                        <input id="input-privKey" type="file" name="privKey">
+                        <h3> Завантажте ваш електронний цифровий підпис як файл ...</h3>
+                        <input id="input-privKey" class=" big-input" type="file" name="privKey">
+                        <h3> .. або вставте як текст ...</h3>
+                        <input id="input-privKey-text" class=" big-input" type="text" name="privKey-text">
                         <button id="authenticate" class="mt-4 btn  submit_btn">Далі</button>
                     </center>
                 </div>
@@ -239,13 +257,27 @@
                     <br>
                     <div id="verify-document" class="block col-sm-12" style="display:none">
                         <h3>Завантажте довіреність: </h3>
-                        <input type="file" id="document-for-verification">
+                        <input type="file" class="big-input" id="document-for-verification">
                         <button id="verify" class="mt-4 btn  submit_btn">Перевірити довіреність</button>
                     </div>
                 </div><!-- row -->
             </div><!-- container -->
         </div>
 </div>
+    <div id="modal-message" class="col-sm-8" style="display: none">
+        <div class="col-sm-2">
+            <img src="static/img/success.png" alt="success" style="height:40px;width:40px"/>
+        </div>
+
+        <div class="col-sm-10">
+            <div  id="message">
+
+            </div>
+            <center>
+                <button class="btn btn-primary" onclick="hideMessage()">Зрозуміло</button>
+            </center>
+        </div>
+    </div>
 <footer>
     <div class="container mt-footer">
         <!--<div class="row">-->
@@ -388,8 +420,27 @@
         }
     });
 
-    $("#authenticate").on('click',()=>{
-
+        $("#input-privKey-text").on('input',async (data)=>{
+            let str = document.getElementById("input-privKey-text").value;
+            let base64 = await this.application.getBase64(str); // prints the base64 string
+            let result = this.application.keccakLib('keccak256').update(base64).digest('hex');
+            setPrivateKey(result);
+            if(getAddress()){
+                authenticate();
+                // alert('Ваш цифровий підпис успішно завантажено');
+            }
+        });
+    $("#authenticate").on('click',async()=>{
+        let fileinput = document.getElementById("input-privKey");
+        let file = fileinput.files[0];
+        let base64 = await this.application.getBase64FromFile(file); // prints the base64 string
+//        sha256 = await getSha256(base64);
+        let result = this.application.keccakLib('keccak256').update(base64).digest('hex');
+        setPrivateKey(result);
+        if(getAddress()){
+            authenticate();
+            // alert('Ваш цифровий підпис успішно завантажено');
+        }
     });
 
     function authenticate(){
@@ -397,9 +448,9 @@
         document.getElementById('pubkey').innerHTML=address;
         hideBlock('auth-form');
         showBlock('cabinet');
-        changeTitle('Конструктор довіреностей');
+        changeTitle('Конструктор документів');
+    };
 
-    }
     $(".navigation-button").on('click',(event)=>{
         let elem = event.currentTarget;
         console.log(elem)
@@ -444,7 +495,7 @@
                     let sha256 = await downloadDocument(htmlDoc);
                     let result = await addApostille(sha256);
                     if(result){
-                        alert("You have uploaded your apostille by creating transaction <br>"+result+"<br> You can look up its progress <a href='https://ropsten.etherscan.io/tx/"+result+"'> HERE </a>");
+                        showMessage("You have uploaded your apostille by creating transaction <br>"+result+"<br> You can look up its progress <a href='https://ropsten.etherscan.io/tx/"+result+"'> HERE </a>");
                     }
                 }catch (e) {
                     alert(e);
@@ -594,6 +645,15 @@
         }
         function changeTitle(str){
             document.getElementById('pagetitle').innerHTML=str;
+        }
+
+        function showMessage(str){
+            document.getElementById('message').innerHTML=str;
+            showBlock('modal-message');
+        }
+        function hideMessage(){
+            hideBlock('modal-message');
+
         }
 </script>
 </body>
